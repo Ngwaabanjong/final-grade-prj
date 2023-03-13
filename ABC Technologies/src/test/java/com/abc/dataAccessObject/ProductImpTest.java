@@ -52,6 +52,7 @@ public class ProductImpTest {
 		assertNotNull(result);
 		assertEquals("demo description", result.getProduct_description());
 	}
+	
 	@Test
 	public void readPriceUserShouldWorkSuccessfully() {
 		RetailAccessObject obj = new RetailDataImp();
