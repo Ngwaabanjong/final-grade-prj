@@ -1,2 +1,0 @@
-# abctechnologies code
-"# assignment1" 
