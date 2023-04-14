@@ -1,0 +1,11 @@
+- hosts: all
+  become: yes
+  tasks:
+   - name: start container
+     service:
+       name: abc-app
+       image: Ngwaabanjong/abc-prj
+       state: started
+       ports:
+        - 8000:8000
+
