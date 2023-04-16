@@ -28,14 +28,14 @@ pipeline {
                 }
             }
         }
-        stage ('Push to Tomcat') {
+        stage ('deploy to tomcat') {
             steps {
-                script {
-                    deploy adapters: [tomcat9(credentialsId: 'tomcat-key', variable: 'tomcat-key', url: 'http://http://3.237.61.61:8080')], contextPath: '/pipeline', onFailure: false, war: 'webapp/target/*.war' 
+                sshagent(['user-key']) {
+                    sh "scp -o StrictHostKeyChecking=no webapp/target/ABCtechnologies-1.0.war ec2-user@34.234.164.39:/opt/tomcat/webapps" 
                 }
             }
         }
-        
+
 
         stage('Deploy to k8s with Ansible'){
             steps{
