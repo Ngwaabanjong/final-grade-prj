@@ -6,7 +6,7 @@ pipeline {
     stages{
         stage('Build Maven'){
             steps{
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Ngwaabanjong/final-abc-prj.git']])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-abc-key', url: 'https://github.com/Ngwaabanjong/private-abc-prj.git']])
                 sh 'mvn clean install'
             }
         }
@@ -31,7 +31,7 @@ pipeline {
         stage ('deploy to tomcat') {
             steps {
                 sshagent(['user-key']) {
-                    sh "scp -o StrictHostKeyChecking=no webapp/target/ABCtechnologies-1.0.war ec2-user@3.234.230.104:/opt/tomcat/webapps" 
+                    sh "scp -o StrictHostKeyChecking=no webapp/target/ABCtechnologies-1.0.war ec2-user@34.201.3.49:/opt/tomcat/webapps" 
                 }
             }
         }
