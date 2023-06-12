@@ -1,54 +1,82 @@
 pipeline {
-    agent any
-    tools{
-        maven 'maven'
+  agent any
+
+  environment {
+    dockerImage = ''
+    registry = 'ngwaabanjong/abc-app1'
+    registryCredential = 'hub-key'
+  }
+  tools {
+    maven 'maven'
+  }
+  stages {
+    stage('Build Maven') {
+      steps {
+        checkout scmGit(branches: [
+          [name: '*/main']
+        ], extensions: [], userRemoteConfigs: [
+          [credentialsId: 'git-classic-token', url: 'https://github.com/Ngwaabanjong/private-abc-prj.git']
+        ])
+        sh 'mvn clean install'
+      }
     }
-    stages{
-        stage('Build Maven'){
-            steps{
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-abc-key', url: 'https://github.com/Ngwaabanjong/private-abc-prj.git']])
-                sh 'mvn clean install'
-            }
-        }
-        stage('Build docker image'){
-            steps{
-                script{
-                    sh 'docker build -t Ngwaabanjong/abc-prj .'
-                }
-            }
-        }
-        stage('Push image to Hub'){
-            steps{
-                script{
-                    withCredentials([string(credentialsId: 'hub-key', variable: 'hub-pwd')]) {
-                    sh 'docker login -u Ngwaabanjong -p ${hub-pwd}'
 
-}
-                    sh 'docker push Ngwaabanjong/abc-prj'
-                }
-            }
-        }
-        stage ('deploy to tomcat') {
-            steps {
-                sshagent(['user-key']) {
-                    sh "scp -o StrictHostKeyChecking=no webapp/target/ABCtechnologies-1.0.war ec2-user@34.201.3.49:/opt/tomcat/webapps" 
-                }
-            }
-        }
-
-
-        stage('Deploy to k8s with Ansible'){
-            steps{
-                script{
-                    sh "ansible-playbook ansible.yaml"
-                }
-            }
-        }
+    stage('compile') {
+      steps {
+        echo 'compiling the application...'
+      }
     }
+
+    stage('test') {
+      steps {
+        echo 'testing the application...'
+      }
+    }
+
+    stage('Package the code') {
+      steps {
+        sh 'mvn package'
+      }
+    }
+
+    stage('Build docker image') {
+      steps {
+        script {
+          sh 'docker build -t ngwaabanjong/abc-app1 .'
+        }
+      }
+    }
+    stage('Push image to Hub') {
+      steps {
+        script {
+          docker.withRegistry('', registryCredential) {
+            sh 'docker push ngwaabanjong/abc-app1'
+          }
+        }
+      }
+    }
+
+    // stage('Deploy to Kubernetes with Ansible') {
+    //   steps {
+    //     script {  
+    //       ansiblePlaybook becomeUser: 'ansible', credentialsId: 'ubuntu-key', inventory: '/var/lib/jenkins/workspace/abc-prj/deployment.yml', playbook: '/home/ansible/deployment.yaml', sudoUser: 'ansible'
+    //     }
+    //   }
+    // }
+    stage('Deploy the code on tomcat server') {
+      steps{
+        sshagent(['user-key']) {
+          sh 'scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/abc-prj/target/ABCtechnologies-1.0.war ec2-user@54.242.97.213:/opt/tomcat/webapps'
+        }
+      }
+    }
+    
+    stage('Deploy to Kubernetes with Ansible') {
+      steps {
+        script {  
+          sh "ansible-playbook deployment.yaml"
+        }
+      }
+    }
+  }
 }
-
-
-
-
-
-
