@@ -66,7 +66,7 @@ pipeline {
     stage('Deploy the code on tomcat server') {
       steps{
         sshagent(['user-key']) {
-          sh 'scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/abc-prj/target/ABCtechnologies-1.0.war ec2-user@54.242.97.213:/opt/tomcat/webapps'
+          sh 'scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/abc-prj/target/ABCtechnologies-1.0.war ec2-user@54.166.197.171:/opt/tomcat/webapps'
         }
       }
     }

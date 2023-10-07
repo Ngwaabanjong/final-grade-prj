@@ -15,13 +15,13 @@ spec:
         version: v1
     spec:
       containers:
-      - image: ngwaabanjong/abc-prj
-        imagePullPolicy: Always
-        name: hostname
-        resources:
-          limits:
-            cpu: 256m
-            memory: 128Mi
+        - image: ngwaabanjong/abc-prj
+          imagePullPolicy: Always
+          name: hostname
+          resources:
+            limits:
+              cpu: 256m
+              memory: 128Mi
       nodeSelector:
         nodetype: generalpurpose
 
@@ -34,9 +34,9 @@ metadata:
   name: abc-v1
 spec:
   ports:
-  - name: web
-    port: 61000
-    protocol: TCP
-    targetPort: 61000
+    - name: web
+      port: 61000
+      protocol: TCP
+      targetPort: 61000
   selector:
     app: abc-v1
